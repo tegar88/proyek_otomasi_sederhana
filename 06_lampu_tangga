@@ -1,0 +1,50 @@
+// =======================
+// DEFINISI PIN
+// =======================
+#define SENSOR_IR_PIN A0     // Sensor infrared analog
+
+int ledPin[5] = {2, 3, 4, 5, 6};   // LED lampu tangga
+
+// =======================
+// VARIABEL
+// =======================
+int nilaiIR;                 // Nilai pembacaan sensor IR
+int batasDeteksi = 500;      // Ambang batas deteksi objek (kalibrasi)
+
+void setup() {
+  // Konfigurasi pin LED sebagai output
+  for (int i = 0; i < 5; i++) {
+    pinMode(ledPin[i], OUTPUT);
+    digitalWrite(ledPin[i], LOW);
+  }
+
+  // Serial Monitor (opsional, untuk pembelajaran)
+  Serial.begin(9600);
+  Serial.println("Lampu Tangga Otomatis Aktif");
+}
+
+void loop() {
+  // Membaca sensor infrared
+  nilaiIR = analogRead(SENSOR_IR_PIN);
+
+  // Tampilkan nilai sensor
+  Serial.print("Nilai Sensor IR: ");
+  Serial.println(nilaiIR);
+
+  // =======================
+  // LOGIKA LAMPU TANGGA
+  // =======================
+  if (nilaiIR < batasDeteksi) {
+    // Objek terdeteksi → LED menyala berurutan
+    for (int i = 0; i < 5; i++) {
+      digitalWrite(ledPin[i], HIGH);
+      delay(150);
+    }
+  } else {
+    // Tidak ada objek → LED mati berurutan
+    for (int i = 4; i >= 0; i--) {
+      digitalWrite(ledPin[i], LOW);
+      delay(150);
+    }
+  }
+}
