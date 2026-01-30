@@ -1,0 +1,71 @@
+#include <Servo.h>   // Library servo
+
+// =======================
+// DEFINISI PIN
+// =======================
+#define TRIG_PIN 9     // Trigger HC-SR04
+#define ECHO_PIN 8     // Echo HC-SR04
+#define SERVO_PIN 6    // Servo motor
+
+// =======================
+// OBJEK SERVO
+// =======================
+Servo tutup;
+
+// =======================
+// VARIABEL
+// =======================
+long durasi;
+int jarak;
+
+void setup() {
+  // Konfigurasi pin sensor ultrasonik
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+
+  // Konfigurasi servo
+  tutup.attach(SERVO_PIN);
+  tutup.write(0);   // Posisi awal tutup (tertutup)
+
+  // Serial monitor (opsional, untuk pembelajaran)
+  Serial.begin(9600);
+  Serial.println("Tempat Sampah Otomatis Aktif");
+}
+
+void loop() {
+  // =======================
+  // PEMICU SENSOR ULTRASONIK
+  // =======================
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  // =======================
+  // BACA PANTULAN ECHO
+  // =======================
+  durasi = pulseIn(ECHO_PIN, HIGH, 25000); // timeout 25 ms
+
+  // Konversi durasi ke jarak (cm)
+  if (durasi > 0) {
+    jarak = durasi * 0.034 / 2;
+  } else {
+    jarak = 0;
+  }
+
+  // Tampilkan jarak di Serial Monitor
+  Serial.print("Jarak: ");
+  Serial.println(jarak);
+
+  // =======================
+  // LOGIKA PEMBUKA TUTUP
+  // =======================
+  if (jarak > 0 && jarak <= 20) {
+    tutup.write(90);     // Buka tutup
+    delay(3000);         // Tetap terbuka 3 detik
+    tutup.write(0);      // Tutup kembali
+  }
+
+  delay(300); // Delay kecil agar stabil
+}
