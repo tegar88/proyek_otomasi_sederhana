@@ -1,0 +1,70 @@
+#include <Servo.h>
+
+// =======================
+// DEFINISI PIN
+// =======================
+#define TRIG_PIN 9     // Trigger HC-SR04
+#define ECHO_PIN 8     // Echo HC-SR04
+#define SERVO_PIN 6    // Servo palang pintu
+
+// =======================
+// OBJEK SERVO
+// =======================
+Servo palang;
+
+// =======================
+// VARIABEL
+// =======================
+long durasi;
+int jarak;
+
+void setup() {
+  // Konfigurasi pin sensor ultrasonik
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+
+  // Inisialisasi servo
+  palang.attach(SERVO_PIN);
+  palang.write(0);   // Posisi awal palang (tertutup)
+
+  // Serial Monitor (opsional)
+  Serial.begin(9600);
+  Serial.println("Palang Pintu Otomatis Aktif");
+}
+
+void loop() {
+  // =======================
+  // PEMICU SENSOR ULTRASONIK
+  // =======================
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  // =======================
+  // BACA ECHO
+  // =======================
+  durasi = pulseIn(ECHO_PIN, HIGH, 25000); // timeout 25 ms
+
+  if (durasi > 0) {
+    jarak = durasi * 0.034 / 2;
+  } else {
+    jarak = 0;
+  }
+
+  // Tampilkan jarak
+  Serial.print("Jarak: ");
+  Serial.println(jarak);
+
+  // =======================
+  // LOGIKA PALANG
+  // =======================
+  if (jarak > 0 && jarak <= 20) {
+    palang.write(90);     // Palang terbuka
+    delay(3000);          // Tunggu 3 detik
+    palang.write(0);      // Palang tertutup kembali
+  }
+
+  delay(300);             // Delay kecil untuk stabilitas
+}
