@@ -1,0 +1,62 @@
+#include <SPI.h>
+#include <MFRC522.h>
+#include <Servo.h>
+
+// =======================
+// DEFINISI PIN
+// =======================
+#define SS_PIN    10    // SDA / SS RFID
+#define RST_PIN   9     // RST RFID
+#define SERVO_PIN 6     // Motor servo pintu
+
+// =======================
+// OBJEK
+// =======================
+MFRC522 rfid(SS_PIN, RST_PIN);
+Servo pintu;
+
+// =======================
+// VARIABEL
+// =======================
+unsigned long waktuBuka = 3000;  // Lama pintu terbuka (ms)
+
+void setup() {
+  // Inisialisasi komunikasi SPI
+  SPI.begin();
+
+  // Inisialisasi RFID
+  rfid.PCD_Init();
+
+  // Inisialisasi servo
+  pintu.attach(SERVO_PIN);
+  pintu.write(0);                // Posisi awal pintu (tertutup)
+
+  // Serial Monitor (opsional, untuk pembelajaran)
+  Serial.begin(9600);
+  Serial.println("Sistem Pintu RFID Aktif");
+}
+
+void loop() {
+  // Cek apakah ada kartu baru
+  if (!rfid.PICC_IsNewCardPresent()) {
+    return;
+  }
+
+  // Cek apakah kartu bisa dibaca
+  if (!rfid.PICC_ReadCardSerial()) {
+    return;
+  }
+
+  // =======================
+  // AKSI SAAT KARTU TERDETEKSI
+  // =======================
+  Serial.println("Kartu Terdeteksi - Pintu Dibuka");
+
+  pintu.write(90);                // Buka pintu
+  delay(waktuBuka);               // Tunggu beberapa detik
+  pintu.write(0);                 // Tutup kembali pintu
+
+  // Hentikan komunikasi kartu
+  rfid.PICC_HaltA();
+  rfid.PCD_StopCrypto1();
+}
