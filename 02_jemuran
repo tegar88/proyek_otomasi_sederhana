@@ -1,0 +1,58 @@
+#include <Servo.h>   // Library servo
+
+// =======================
+// DEFINISI PIN
+// =======================
+#define SENSOR_HUJAN_PIN A0   // Sensor hujan (analog)
+#define SERVO_PIN 6          // Motor servo jemuran
+
+// =======================
+// OBJEK SERVO
+// =======================
+Servo jemuran;
+
+// =======================
+// VARIABEL
+// =======================
+int nilaiHujan;               // Nilai pembacaan sensor hujan
+int batasHujan = 500;         // Ambang batas hujan (kalibrasi)
+
+// =======================
+// SETUP
+// =======================
+void setup() {
+  // Inisialisasi servo
+  jemuran.attach(SERVO_PIN);
+  jemuran.write(0);           // Posisi awal jemuran (keluar)
+
+  // Serial Monitor (opsional, untuk pembelajaran)
+  Serial.begin(9600);
+  Serial.println("Jemuran Otomatis Aktif");
+}
+
+// =======================
+// LOOP
+// =======================
+void loop() {
+  // Membaca sensor hujan
+  nilaiHujan = analogRead(SENSOR_HUJAN_PIN);
+
+  // Tampilkan nilai sensor
+  Serial.print("Nilai Sensor Hujan: ");
+  Serial.println(nilaiHujan);
+
+  // =======================
+  // LOGIKA JEMURAN
+  // =======================
+  if (nilaiHujan > batasHujan) {
+    // Hujan terdeteksi
+    jemuran.write(90);        // Jemuran masuk
+    Serial.println("HUJAN - JEMURAN MASUK");
+  } else {
+    // Tidak hujan
+    jemuran.write(0);         // Jemuran keluar
+    Serial.println("CERAH - JEMURAN KELUAR");
+  }
+
+  delay(1000);                // Delay agar pembacaan stabil
+}
