@@ -1,0 +1,53 @@
+// =======================
+// DEFINISI PIN
+// =======================
+#define SENSOR_TANAH_PIN A0   // Sensor kelembapan tanah (analog)
+#define RELAY_PIN 7           // Relay pompa air
+
+// =======================
+// VARIABEL
+// =======================
+int nilaiTanah;               // Nilai pembacaan sensor
+int batasKering = 600;        // Ambang batas tanah kering (kalibrasi)
+
+// =======================
+// SETUP
+// =======================
+void setup() {
+  // Konfigurasi pin relay
+  pinMode(RELAY_PIN, OUTPUT);
+
+  // Relay OFF di awal (relay aktif LOW)
+  digitalWrite(RELAY_PIN, HIGH);
+
+  // Serial Monitor (opsional, untuk pembelajaran)
+  Serial.begin(9600);
+  Serial.println("Penyiram Tanaman Otomatis Aktif");
+}
+
+// =======================
+// LOOP
+// =======================
+void loop() {
+  // Membaca sensor kelembapan tanah
+  nilaiTanah = analogRead(SENSOR_TANAH_PIN);
+
+  // Tampilkan nilai sensor
+  Serial.print("Nilai Kelembapan Tanah: ");
+  Serial.println(nilaiTanah);
+
+  // =======================
+  // LOGIKA PENYIRAMAN
+  // =======================
+  if (nilaiTanah > batasKering) {
+    // Tanah kering → pompa ON
+    digitalWrite(RELAY_PIN, LOW);
+    Serial.println("TANAH KERING - POMPA MENYALA");
+  } else {
+    // Tanah lembap → pompa OFF
+    digitalWrite(RELAY_PIN, HIGH);
+    Serial.println("TANAH LEMBAP - POMPA MATI");
+  }
+
+  delay(1000);  // Delay agar pembacaan stabil
+}
